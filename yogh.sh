@@ -21,7 +21,7 @@ export PATH="$PREFIX/bin:$PATH"
 
 # Check out or update the 3 repositories
 
-for i in ghdl/ghdl tgingold/ghdlsynth-beta YosysHQ/yosys berkeley-abc/abc
+for i in ghdl/ghdl tgingold/ghdlsynth-beta YosysHQ/yosys YosysHQ/abc
 do
   if ! cd $(basename $i) 2>/dev/null
   then
@@ -48,23 +48,18 @@ cd yosys || exit 1
 # Don't use libreadline-dev when not installed. Note: not cross-compile aware.
 [ ! -e /usr/include/readline/readline.h ] && X="$X ENABLE_READLINE=0"
 # Use the optimizer revision the yosys guys regression tested
-if [ ! -e abc ]
-then
-  ln -sf ../abc abc &&
-  ABCREV=$(sed -n 's/^ABCREV *= *//p' Makefile)
-  cd abc &&
-  git checkout $ABCREV &&
-  cd .. || exit 1
-fi
-make PREFIX="$PREFIX" all install -j $(nproc) $X ABCPULL=0 &&
+[ ! -e abc ] && ln -sf ../abc abc
+make PREFIX="$PREFIX" all install -j $(nproc) $X ABCREV=default ABCPULL=0 &&
 cd .. || exit 1
 
 cd ghdl &&
 ./configure --enable-libghdl --enable-synth --prefix="$PREFIX" &&
-#make && make install &&
 make all install -j $(nproc)
 cd .. || exit 1
 
 cd ghdlsynth-beta &&
 make all install -j $(nproc) &&
 cd .. || exit 1
+
+# add icestorm
+# add nextpnr
