@@ -1,10 +1,14 @@
 #!/bin/bash
 
 # Build yosys + GHDL synthesizer fully open source toolchain for FPGA bitstreams
+# Plus icestorm (bitstream packager and installer for Lattice ICE40)
 
-# build prerequisites: gnat-8 or newer (https://www.adacore.com/download)
-# and libffi-dev and tcl-dev (probably in your distro repo).
-# It'll use libreadline-dev if present.
+# build prerequisites for ghdlsynth:
+#   gnat-8 or newer (https://www.adacore.com/download)
+#   libffi-dev and tcl-dev (probably in your distro repo).
+#   It'll use libreadline-dev if present.
+# build prerequisites for icestorm: libftdi-dev
+# build prerequisites for nextpnr: libboost{,thread,system,iostreams,rogram-options,filesystem}-dev libeigen3-dev
 
 # We use nproc to autodetect parallism, use "taskset 1 COMMAND..." to thwart
 
@@ -21,7 +25,7 @@ export PATH="$PREFIX/bin:$PATH"
 
 # Check out or update the 3 repositories
 
-for i in ghdl/ghdl tgingold/ghdlsynth-beta YosysHQ/yosys YosysHQ/abc
+for i in ghdl/ghdl tgingold/ghdlsynth-beta YosysHQ/{yosys,abc,nextpnr,icestorm}
 do
   if ! cd $(basename $i) 2>/dev/null
   then
@@ -61,5 +65,15 @@ cd ghdlsynth-beta &&
 make all install -j $(nproc) &&
 cd .. || exit 1
 
-# add icestorm
-# add nextpnr
+cd icestorm &&
+make PREFIX="$PREFIX" STATIC=1 all -j $(nproc) &&
+# The build is SMP safe but the install is not for some reason
+make PREFIX="$PREFIX" install &&
+cd .. || exit 1
+
+cd nextpnr &&
+cmake . -DARCH=ice40 -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+  -DICESTORM_INSTALL_PREFIX="$PREFIX" -DBUILD_GUI=OFF -DBUILD_PYTHON=OFF \
+  -DSTATIC_BUILD=ON &&
+make -j $(nproc) &&
+cd .. || exit 1
