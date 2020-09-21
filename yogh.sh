@@ -8,7 +8,7 @@
 #   libffi-dev and tcl-dev (probably in your distro repo).
 #   It'll use libreadline-dev if present.
 # build prerequisites for icestorm: libftdi-dev
-# build prerequisites for nextpnr: libboost{,thread,system,iostreams,rogram-options,filesystem}-dev libeigen3-dev
+# build prerequisites for nextpnr: libboost{,thread,system,iostreams,program-options,filesystem}-dev libeigen3-dev
 
 # We use nproc to autodetect parallism, use "taskset 1 COMMAND..." to thwart
 
@@ -76,4 +76,5 @@ cmake . -DARCH=ice40 -DCMAKE_INSTALL_PREFIX="$PREFIX" \
   -DICESTORM_INSTALL_PREFIX="$PREFIX" -DBUILD_GUI=OFF -DBUILD_PYTHON=OFF \
   -DSTATIC_BUILD=ON &&
 make -j $(nproc) &&
+make install &&
 cd .. || exit 1
