@@ -1,0 +1,11 @@
+Fully open source VHDL bitstream generator for iCE40 FPGA, built from
+Yosys + GHDL + ghdlsynth + nextpnr + icestorm
+
+  ./yogh.sh
+  export PATH=~/yogh/bin:$PATH
+
+Export PREFIX= to specify install location for new toolchain (default ~/yogh).
+Export NONET=1 to skip git updates of subrepos (run without net access).
+Export NOCLEAN=1 to skip repo clean (perform incremental build).
+
+See script comments for build prerequisites (uses debian package names).
